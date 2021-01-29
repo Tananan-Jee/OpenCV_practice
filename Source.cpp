@@ -262,116 +262,118 @@ using namespace std;
 
 /////////////////////  Do single-camera calibration and get intrinsic & extrinsic parameters  //////////////////////
 
-//// Defining the dimensions of checkerboard
-//int CHECKERBOARD[2]{ 7,7 };
-//
-//int main()
-//{
-//    // Creating vector to store vectors of 3D points for each checkerboard image
-//    vector<vector<Point3f> > objpoints;
-//
-//    // Creating vector to store vectors of 2D points for each checkerboard image
-//    vector<vector<Point2f> > imgpoints;
-//
-//    // Defining the world coordinates for 3D points
-//    vector<Point3f> objp;
-//    for (int i{ 0 }; i < CHECKERBOARD[1]; i++)
-//    {
-//        for (int j{ 0 }; j < CHECKERBOARD[0]; j++)
-//            objp.push_back(Point3f(j*2.1, i*2.1, 0));
-//    }
-//
-//
-//    // Extracting path of individual image stored in a given directory
-//    vector<String> images;
-//    // Path of the folder containing checkerboard images
-//    string path = "pics/chess/*.jpg";
-//
-//    glob(path, images);
-//
-//    Mat frame, gray;
-//    // vector to store the pixel coordinates of detected checker board corners 
-//    vector<Point2f> corner_pts;
-//    bool success;
-//
-//    // Looping over all the images in the directory
-//    for (int i{ 0 }; i < images.size(); i++)
-//    {
-//        frame = imread(images[i]);
-//        cvtColor(frame, gray, COLOR_BGR2GRAY);
-//
-//        // Finding checker board corners
-//        // If desired number of corners are found in the image then success = true  
-//        success = findChessboardCorners(gray, Size(CHECKERBOARD[0], CHECKERBOARD[1]), corner_pts, CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_FAST_CHECK | CALIB_CB_NORMALIZE_IMAGE);
-//        
-//        /*
-//         * If desired number of corner are detected,
-//         * we refine the pixel coordinates and display
-//         * them on the images of checker board
-//        */
-//        if (success)
-//        {
-//            TermCriteria criteria(TermCriteria::EPS | TermCriteria::MAX_ITER, 30, 0.001);
-//
-//            // refining pixel coordinates for given 2d points.
-//            cornerSubPix(gray, corner_pts, Size(11, 11), Size(-1, -1), criteria);
-//
-//            // Displaying the detected corner points on the checker board
-//            drawChessboardCorners(frame, Size(CHECKERBOARD[0], CHECKERBOARD[1]), corner_pts, success);
-//
-//            objpoints.push_back(objp);
-//            imgpoints.push_back(corner_pts);
-//        }
-//
-//        imshow("Image", frame);
-//        waitKey(0);
-//    }
-//
-//    destroyAllWindows();
-//
-//    Mat cameraMatrix, distCoeffs, R, T, inpara, expara, perview;
-//
-//    /*
-//     * Performing camera calibration by
-//     * passing the value of known 3D points (objpoints)
-//     * and corresponding pixel coordinates of the
-//     * detected corners (imgpoints)
-//    */
-//    calibrateCamera(objpoints, imgpoints, Size(gray.rows, gray.cols), cameraMatrix, distCoeffs, R, T, inpara, expara, perview);
-//
-//    cout << "cameraMatrix : " << cameraMatrix << endl;
-//    cout << "distCoeffs : " << distCoeffs << endl;
-//    cout << "Rotation vector : " << R << endl;
-//    cout << "Translation vector : " << T << endl;
-//    cout << "Intrinsics parameters : " << expara << endl;
-//    cout << "Extrinsics parameters : " << distCoeffs << endl;
-//    cout << "perViewErrors : " << perview << endl;
-//
-//
-//    /////////////////////  Display the reprojected points on the captured image based on the estimated parameters in single-camera calibration  //////////////////////
-//
-//    Mat objectPoints(4.2, 4.2, 0);
-//    Mat imagePoints;
-//    //vector<Point2f> projectedPoints;
-//    Mat rvec;
-//    Mat tvec;
-//
-//    // Looping over all the images in the directory
-//    for (int i{ 0 }; i < images.size(); i++)
-//    {
-//        Mat bg = imread(images[i], CV_8UC3);
-//        rvec = R.row(i).clone();
-//        rvec = T.row(i).clone();
-//        projectPoints(objectPoints, rvec, tvec, cameraMatrix, distCoeffs, imagePoints);
-//        print(imagePoints);
-//        circle(bg, Point(256,256), 3, Scalar(255,0,0));
-//        imshow("Projected Point", bg);
-//
-//        waitKey(0);
-//    }
-//    
-//
-//
-//    return 0;
-//}
+// Defining the dimensions of checkerboard
+int CHECKERBOARD[2]{ 7,7 };
+
+int main()
+{
+    // Creating vector to store vectors of 3D points for each checkerboard image
+    vector<vector<Point3f> > objpoints;
+
+    // Creating vector to store vectors of 2D points for each checkerboard image
+    vector<vector<Point2f> > imgpoints;
+
+    // Defining the world coordinates for 3D points
+    vector<Point3f> objp;
+    for (int i{ 0 }; i < CHECKERBOARD[1]; i++)
+    {
+        for (int j{ 0 }; j < CHECKERBOARD[0]; j++)
+            objp.push_back(Point3f(j*2.1, i*2.1, 0));
+    }
+
+
+    // Extracting path of individual image stored in a given directory
+    vector<String> images;
+    // Path of the folder containing checkerboard images
+    string path = "pics/chess/*.jpg";
+
+    glob(path, images);
+
+    Mat frame, gray;
+    // vector to store the pixel coordinates of detected checker board corners 
+    vector<Point2f> corner_pts;
+    bool success;
+
+    // Looping over all the images in the directory
+    for (int i{ 0 }; i < images.size(); i++)
+    {
+        frame = imread(images[i]);
+        cvtColor(frame, gray, COLOR_BGR2GRAY);
+
+        // Finding checker board corners
+        // If desired number of corners are found in the image then success = true  
+        success = findChessboardCorners(gray, Size(CHECKERBOARD[0], CHECKERBOARD[1]), corner_pts, CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_FAST_CHECK | CALIB_CB_NORMALIZE_IMAGE);
+        
+        /*
+         * If desired number of corner are detected,
+         * we refine the pixel coordinates and display
+         * them on the images of checker board
+        */
+        if (success)
+        {
+            TermCriteria criteria(TermCriteria::EPS | TermCriteria::MAX_ITER, 30, 0.001);
+
+            // refining pixel coordinates for given 2d points.
+            cornerSubPix(gray, corner_pts, Size(11, 11), Size(-1, -1), criteria);
+
+            // Displaying the detected corner points on the checker board
+            drawChessboardCorners(frame, Size(CHECKERBOARD[0], CHECKERBOARD[1]), corner_pts, success);
+
+            objpoints.push_back(objp);
+            imgpoints.push_back(corner_pts);
+        }
+
+        imshow("Image", frame);
+        waitKey(0);
+    }
+
+    destroyAllWindows();
+
+    Mat cameraMatrix, distCoeffs, R, T, inpara, expara, perview;
+
+    /*
+     * Performing camera calibration by
+     * passing the value of known 3D points (objpoints)
+     * and corresponding pixel coordinates of the
+     * detected corners (imgpoints)
+    */
+    calibrateCamera(objpoints, imgpoints, Size(gray.rows, gray.cols), cameraMatrix, distCoeffs, R, T, inpara, expara, perview);
+
+    cout << "cameraMatrix : " << cameraMatrix << endl;
+    cout << "distCoeffs : " << distCoeffs << endl;
+    cout << "Rotation vector : " << R << endl;
+    cout << "Translation vector : " << T << endl;
+    cout << "Intrinsics parameters : " << expara << endl;
+    cout << "Extrinsics parameters : " << distCoeffs << endl;
+    cout << "perViewErrors : " << perview << endl;
+
+
+    /////////////////////  Display the reprojected points on the captured image based on the estimated parameters in single-camera calibration  //////////////////////
+
+    Mat objectPoints(4.2, 4.2, 0);
+    vector<int> points2d(2);
+    int projectx;
+    int projecty;
+    Mat rvec;
+    Mat tvec;
+
+    // Looping over all the images in the directory
+    for (int i{ 0 }; i < images.size(); i++)
+    {
+        Mat bg = imread(images[i], CV_8UC3);
+        rvec = R.row(i).clone();
+        tvec = T.row(i).clone();
+        projectPoints(objectPoints, rvec, tvec, cameraMatrix, distCoeffs, points2d);
+        projectx = points2d.at(0);
+        projecty = points2d.at(1);
+        circle(bg, Point(projectx,projecty), 3, Scalar(255,0,0));
+        imshow("Projected Point", bg);
+
+        waitKey(0);
+    }
+    
+
+
+    return 0;
+}
 
